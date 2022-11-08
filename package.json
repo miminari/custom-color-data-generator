@@ -1,7 +1,7 @@
 {
-  "name": "my-first-plugin",
-  "version": "1.0.0",
-  "description": "自分のFigmaプラグイン",
+  "name": "custom-color-data-generator",
+  "version": "0.0.1",
+  "description": "figma plugin for custom color data generating",
   "main": "code.js",
   "scripts": {
     "build": "tsc -p tsconfig.json",
