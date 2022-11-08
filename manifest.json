@@ -1,0 +1,10 @@
+{
+  "name": "custom-color-data-generator",
+  "id": "1171384352247170365",
+  "api": "1.0.0",
+  "main": "code.js",
+  "editorType": [
+    "figma"
+  ],
+  "ui": "ui.html"
+}
