@@ -1,6 +1,10 @@
 # custom color data generator
 
+[Try on Figma](https://www.figma.com/community/plugin/1171384352247170365)
+
 Figma plugin for custom color data generating.
+
+Note: Still in prototype
 
 ## Install
 

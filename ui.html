@@ -16,7 +16,7 @@
   }
 </style>
 
-<h1>Custom Color Data Generator</h1>
+<h1>Custom Color Data Generator ver.0.0.2</h1>
 
 <div>
   <h2>file type</h2>
@@ -50,9 +50,9 @@
     <label for="radioButton3" class="radio__label">CSS</label>
   </div>
 
-  <!-- <div>
-    <button class="button button--primary" id="submit-create">Create</button>
-  </div> -->
+  <div>
+    <button class="button button--primary" id="submit-create">Generate</button>
+  </div>
 
   <div>
     <label for="output-area">CODES</label>
@@ -61,12 +61,25 @@
 </div>
 <script>
   const codeOutPutArea = document.getElementById("output-area");
+  const createButton = document.getElementById("submit-create");
+  console.log(createButton);
 
-  onmessage = ({ data: { pluginMessage } }) => {
-    const messageType = pluginMessage.type;
-    if (messageType === "render") {
-      const outputedCode = pluginMessage.colorsData;
-      codeOutPutArea.innerHTML = outputedCode;
+  // 処理を受け取って表示する
+  window.addEventListener("message",(event) => {
+    const message = event.data.pluginMessage
+
+    switch (message.type) {
+      case "render":
+        console.log(message.body)
+        codeOutPutArea.innerHTML = message.body;
+        break
     }
-  }
+  })
+
+  // Generateボタンが押されたら処理を渡す
+  createButton.addEventListener('click', () => {
+    const fileType = document.querySelector('input[name="filetype"]:checked').value;
+    console.log(fileType);
+    parent.postMessage({pluginMessage: {fileType}}, '*');
+  })
 </script>

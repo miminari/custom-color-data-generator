@@ -7,6 +7,7 @@ type colorData = {
 figma.showUI(__html__);
 figma.ui.resize(500, 500);
 
+// 現在のファイルの塗りのスタイルを取得
 const styles = figma.getLocalPaintStyles();
 
 // toCamelCase
@@ -18,6 +19,12 @@ const camelize = (str: string) => {
     })
     .join("");
   return camelizedWords;
+};
+
+// toSnakeCase
+const snakeCase = (str: string) => {
+  const camelizedWords = camelize(str);
+  return camelizedWords.replace(/[A-Z]/g, (c) => { return '_' + c.toLowerCase() }).slice(1);
 };
 
 // 255に換算
@@ -62,21 +69,80 @@ const toJSONHex = (color: colorData) => {
   return JSONData;
 };
 
-const colorsData = styles.map((style) => {
-  const opacity = Number(style.paints[0].opacity);
-  if (style.paints[0].type !== "SOLID") {
-    // 単色でなければスキップ
-    return;
-  }
-  const color = style.paints[0].color;
-  const camelizedName = camelize(style.name);
-  const hexString = rgbToHex(color);
-  const jsonOriginalHex = toJSONHex({ name:camelizedName, hex:hexString, opacity:opacity });
-  console.log(jsonOriginalHex);
-  return jsonOriginalHex;
-}).join(',\n');
-
-figma.ui.postMessage({
-    type: "render",
-    colorsData,
-  });
+if (figma.editorType === "figma") {
+  figma.ui.onmessage = (message) => {
+    console.log(message);
+    let currentData;
+    switch (message.fileType) {
+      case "CSS":
+        console.log(message.fileType);
+        // cssの形式に整形
+        const getCSSColorData = styles
+          .map((style) => {
+            if (style.paints[0].type !== "SOLID") {
+              // 単色でなければスキップ
+              return;
+            }
+            const color = style.paints[0].color;
+            const snakeCaseName = snakeCase(style.name);
+            return (
+              "--color-" +
+              snakeCaseName +
+              ": rgba(" +
+              toRgba(color, Number(style.paints[0].opacity)) +
+              ")"
+            );
+          })
+          .join(";\n");
+        currentData = getCSSColorData;
+        break;
+      case "XML":
+        console.log(message.fileType);
+        // XML形式に整形
+        const getXMLColorData = styles
+          .map((style) => {
+            if (style.paints[0].type !== "SOLID") {
+              // 単色でなければスキップ
+              return;
+            }
+            const color = style.paints[0].color;
+            const snakeCaseName = snakeCase(style.name);
+            return (
+              '<color name="' +
+              snakeCaseName +
+              '">' +
+              rgbToHex(color) +
+              "</color>"
+            );
+          })
+          .join("\n");
+        currentData = getXMLColorData;
+        break;
+      case "JSON":
+      default:
+        console.log(message.fileType);
+        // json形式に整形
+        const getJSONColorsData = styles
+          .map((style) => {
+            const opacity = Number(style.paints[0].opacity);
+            if (style.paints[0].type !== "SOLID") {
+              // 単色でなければスキップ
+              return;
+            }
+            const color = style.paints[0].color;
+            const camelizedName = camelize(style.name);
+            const hexString = rgbToHex(color);
+            const jsonOriginalHex = toJSONHex({
+              name: camelizedName,
+              hex: hexString,
+              opacity: opacity,
+            });
+            return jsonOriginalHex;
+          })
+          .join(",\n");
+        currentData = getJSONColorsData;
+        break;
+    }
+    figma.ui.postMessage({ type: "render", body: currentData });
+  };
+}
