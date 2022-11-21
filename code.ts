@@ -61,7 +61,7 @@ const rgbToHex = (rgb: RGB) => {
 
 // jsonの独自形式に整形
 const toJSONHex = (color: colorData) => {
-  let JSONData = color.name + ': "' + color.hex + '"';
+  let JSONData = '  "' + color.name + '" : "' + color.hex + '"';
   if (color.opacity !== 1) {
     const opacityTo10 = Number(color.opacity.toFixed(1)) * 100;
     JSONData += "." + opacityTo10;
@@ -140,7 +140,7 @@ if (figma.editorType === "figma") {
             return jsonOriginalHex;
           })
           .join(",\n");
-        currentData = getJSONColorsData;
+        currentData = "{\n" + getJSONColorsData + "\n}";
         break;
     }
     figma.ui.postMessage({ type: "render", body: currentData });
