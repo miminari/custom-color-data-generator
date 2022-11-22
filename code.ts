@@ -61,11 +61,12 @@ const rgbToHex = (rgb: RGB) => {
 
 // jsonの独自形式に整形
 const toJSONHex = (color: colorData) => {
-  let JSONData = '  "' + color.name + '" : "' + color.hex + '"';
   if (color.opacity !== 1) {
     const opacityTo10 = Number(color.opacity.toFixed(1)) * 100;
-    JSONData += "." + opacityTo10;
+    color.hex += "." + opacityTo10;
   }
+  let JSONData = '  "' + color.name + '" : "' + color.hex + '"';
+
   return JSONData;
 };
 
